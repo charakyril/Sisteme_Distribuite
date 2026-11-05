@@ -5,12 +5,12 @@ import "fmt"
 func main() {
 	ch := make(chan string)
 
-	// A goroutine (not main) sends the message
+	// A goroutine sends the message
 	go func() {
 		ch <- "hello"
 	}()
 
-	// main receives it; this blocks until the message arrives
+	// main receives it
 	msg := <-ch
 	fmt.Println("main received:", msg)
 }
