@@ -10,7 +10,7 @@ func main() {
 	go func() {
 		msg := <-ch
 		fmt.Println("goroutine received:", msg)
-		close(done) // tell main we are finished, so it does not exit early
+		close(done) 
 	}()
 
 	// main sends the message
