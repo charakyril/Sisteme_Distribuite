@@ -10,7 +10,7 @@ func main() {
 		ch <- "world"
 	}()
 
-	// main receives two messages on the same channel
+	//receives two messages on the same channel
 	first := <-ch
 	second := <-ch
 	fmt.Println("first message: ", first)
