@@ -2,7 +2,6 @@ package main
 
 import "fmt"
 
-// send puts a message on the channel.
 func send(ch chan<- string) {
 	ch <- "hello"
 }
