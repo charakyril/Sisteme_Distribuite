@@ -10,10 +10,10 @@ import (
 
 type LamportClock struct{ counter int }
 
-// Tick increments the counter (internal event)
+// increments the counter
 func (l *LamportClock) Tick() { l.counter++ }
 
-// Send increments the counter before sending a message; the new value is the timestamp
+// Send increments the counter
 func (l *LamportClock) Send() { l.counter++ }
 
 // Receive sets the counter to max(local, received) + 1
@@ -44,14 +44,12 @@ func process(id int, next chan<- Message, inbox <-chan Message, events chan<- Ev
 	clock := &LamportClock{}
 
 	for r := 0; r < rounds; r++ {
-		// Random number of internal events -> counters grow randomly between messages
 		internal := rand.Intn(3)
 		for k := 0; k < internal; k++ {
 			clock.Tick()
 			events <- Event{id, clock.counter, "internal"}
 		}
 
-		// Send to the next process in the ring
 		clock.Send()
 		next <- Message{sender: id, ts: clock.counter}
 		events <- Event{id, clock.counter, "send"}
@@ -69,7 +67,7 @@ func main() {
 	const n = 3
 	const rounds = 3
 
-	// inboxes[i] is the inbox of process P(i+1); buffered so sends never block
+	// inboxes[i] is the inbox of process P(i+1)
 	inboxes := make([]chan Message, n)
 	for i := range inboxes {
 		inboxes[i] = make(chan Message, rounds)
@@ -78,7 +76,7 @@ func main() {
 	events := make(chan Event)
 	var wg sync.WaitGroup
 
-	// Ring topology: P1 -> P2 -> P3 -> P1
+	// P1, P2, P3, P1
 	for i := 0; i < n; i++ {
 		wg.Add(1)
 		go process(i+1, inboxes[(i+1)%n], inboxes[i], events, rounds, &wg)
@@ -89,13 +87,13 @@ func main() {
 		close(events)
 	}()
 
-	// main stores all events
+	// αποθηκευση event
 	var all []Event
 	for e := range events {
 		all = append(all, e)
 	}
 
-	// Sort ascending by Lamport timestamp
+	// ταξινόμηση
 	sort.Slice(all, func(i, j int) bool { return less(all[i], all[j]) })
 
 	for _, e := range all {
