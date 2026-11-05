@@ -6,12 +6,13 @@ import (
 	"time"
 )
 
-// Stores the deviation from the real time
+// deviation from the real time
 type Clock struct{ offset time.Duration }
 
 func (c *Clock) Now() time.Time { return time.Now().Add(c.offset) }
 
-
+// t = ((T2 - T1) + (T3 - T4)) / 2
+// d = (T4 - T1) - (T3 - T2)
 func estimate(t1, t2, t3, t4 time.Time) (theta, delta time.Duration) {
 	theta = (t2.Sub(t1) + t3.Sub(t4)) / 2
 	delta = t4.Sub(t1) - t3.Sub(t2)
@@ -19,12 +20,18 @@ func estimate(t1, t2, t3, t4 time.Time) (theta, delta time.Duration) {
 }
 
 func measure(c_clock, s_clock *Clock) (theta, delta time.Duration) {
+	// Request
+	t1 := c_clock.Now()
 	time.Sleep(3*time.Millisecond + time.Duration(rand.Intn(10))*time.Millisecond)
+	t2 := s_clock.Now()
 
-	
+	// Processing between 5 and 20 ms
 	time.Sleep(5*time.Millisecond + time.Duration(rand.Intn(20))*time.Millisecond)
-	
+	t3 := s_clock.Now()
+
+	// Response
 	time.Sleep(3*time.Millisecond + time.Duration(rand.Intn(10))*time.Millisecond)
+	t4 := c_clock.Now()
 
 	return estimate(t1, t2, t3, t4)
 }
@@ -37,8 +44,8 @@ func abs(d time.Duration) time.Duration {
 }
 
 func main() {
-	const initialOffset = 500 * time.Millisecond // the client clock is 500 ms ahead
-	server := &Clock{}                           // the server has the correct time
+	const initialOffset = 500 * time.Millisecond
+	server := &Clock{} //correct time
 
 	// ---- (a) a single request/response ----
 	fmt.Println("=== (a) single measurement ===")
@@ -54,7 +61,6 @@ func main() {
 		fmt.Println("The offset decreased.")
 	}
 
-	// ---- (b) 10 repetitions with the same initial offset ----
 	fmt.Println("\n=== (b) 10 measurements ===")
 	const runs = 10
 	thetas := make([]time.Duration, runs)
