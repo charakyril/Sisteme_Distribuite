@@ -27,7 +27,7 @@ func robot(name string, route []Point, out chan<- Point, in <-chan Point, report
 		time.Sleep(time.Duration(20+rand.Intn(60)) * time.Millisecond)
 	}
 	fmt.Printf("%s finished its route and stopped\n", name)
-	close(out) // notify the other robot that we stopped
+	close(out) 
 
 	count := <-received
 	report <- fmt.Sprintf("%s is done (received %d positions)", name, count)
@@ -45,7 +45,6 @@ func main() {
 	go robot("Robot A", routeA, aToB, bToA, report)
 	go robot("Robot B", routeB, bToA, aToB, report)
 
-	// Observer waits for both robots to report
 	fmt.Println("Observer:", <-report)
 	fmt.Println("Observer:", <-report)
 	fmt.Println("Observer: both robots completed their tasks")
