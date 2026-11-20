@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 )
-
+//fuladio
 func diametru(adj [][]int) int {
 	n := len(adj)
 	diam := 0
