@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 )
-//idio me fulladio 
+
 func diametru(adj [][]int) int {
 	n := len(adj)
 	diam := 0
